@@ -1,0 +1,36 @@
+<div class="col-md-6 offset-md-3 pt-5">
+  <form [formGroup]="formLogin">
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" formControlName="email" id="email"
+      class="form-control" [class.is-invalid]="formLogin.get('email').errors && formLogin.get('email').dirty">
+      <div *ngIf="formLogin.get('email').errors && formLogin.get('email').dirty" class="invalid-feedback d-block">
+        <div *ngIf="formLogin.get('email').hasError('required')">
+          email requerido 
+        </div>
+        <div *ngIf="formLogin.get('email').hasError('email')">
+          email invalido 
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="password">Contraseña</label>
+      <input type="password" formControlName="password" id="password"
+      class="form-control" [class.is-invalid]="formLogin.get('password').errors && formLogin.get('password').dirty">
+      <div *ngIf="formLogin.get('password').errors && formLogin.get('password').dirty" class="invalid-feedback d-block">
+        <div *ngIf="formLogin.get('password').hasError('required')">
+          contraseña requerida 
+        </div>
+        <div *ngIf="formLogin.get('password').hasError('minlength')">
+          la contraseña debe tener minimo 6 caracteres
+        </div>
+      </div>
+    </div>
+    <div class="form-group form-check">
+      <input type="checkbox" class="form-check-input" id="remember">
+      <label class="form-check-label" for="remember">Recordarme</label>
+    </div>
+    <button type="submit" (click)="register()" [disabled]="formLogin.invalid" class="btn btn-primary">Entrar</button>
+  </form>
+</div>
+  
