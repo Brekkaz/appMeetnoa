@@ -1,0 +1,165 @@
+<div class="container">
+  <div class="row contentLogin pb-5">
+    <div class="col-md-6 text-center">
+      <div class="col-md-12 text-white">
+        <h1 class="fontMeetnoa display-1">Meetnoa</h1>
+        <h4>conoce, disfruta, diviertete</h4>
+      </div>
+      <hr>
+      <div class="col-md-12">
+        <img src="assets/img/loginSocial.png" alt="" class="w-100 d-none d-md-block">
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div *ngIf="error.state" class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ error.msg }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        </button>
+      </div>
+
+      <div class="card formText">
+        <div class="card-body px-1 py-2">
+          <form [formGroup]="formLogin" >
+            <div class="form-row">
+              <div class="col-5">
+                <input type="email" formControlName="email" placeholder="Email" class="form-control">
+              </div>
+              <div class="col-4">
+                <input type="password" formControlName="password" placeholder="Contraseña" class="form-control">
+              </div>
+              <div class="col-3">
+                <button type="submit" (click)="onLoginEmailPassword()" class="btn-Login form-control form-control-sm h-100 btn btn-primary">
+                  Entrar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="card formText mx-4">
+        <div class="card-header text-center p-0">
+          <i><h2>Crear cuenta</h2></i>
+        </div>
+        <div class="card-body p-4">
+          <form [formGroup]="formRegister">
+
+            <div class="form-row pb-2">
+              <div class="col">
+                <input type="text" formControlName="firstname" placeholder="Nombre"
+                class="form-control" [class.is-invalid]="formRegister.get('firstname').errors && formRegister.get('firstname').touched">
+                <div *ngIf="formRegister.get('firstname').errors && formRegister.get('firstname').touched" class="invalid-feedback d-block">
+                  <div *ngIf="formRegister.get('firstname').hasError('required')">
+                    nombre requerido 
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <input type="text" formControlName="lastname" placeholder="Apellido"
+                class="form-control" [class.is-invalid]="formRegister.get('lastname').errors && formRegister.get('lastname').touched">
+                <div *ngIf="formRegister.get('lastname').errors && formRegister.get('lastname').touched" class="invalid-feedback d-block">
+                  <div *ngIf="formRegister.get('lastname').hasError('required')">
+                    apellido requerido 
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row pb-2">
+              <div class="col">
+                <input type="email" formControlName="email" placeholder="Email"
+                class="form-control" [class.is-invalid]="formRegister.get('email').errors && formRegister.get('email').touched">
+                <div *ngIf="formRegister.get('email').errors && formRegister.get('email').touched" class="invalid-feedback d-block">
+                  <div *ngIf="formRegister.get('email').hasError('required')">
+                    email requerido 
+                  </div>
+                  <div *ngIf="formRegister.get('email').hasError('email')">
+                    email invalido 
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row pb-2">
+              <div class="col">
+                <input type="password" formControlName="password" placeholder="Contraseña"
+                class="form-control" [class.is-invalid]="formRegister.get('password').errors && formRegister.get('password').touched">
+                <div *ngIf="formRegister.get('password').errors && formRegister.get('password').touched" class="invalid-feedback d-block">
+                  <div *ngIf="formRegister.get('password').hasError('required')">
+                    contraseña requerida 
+                  </div>
+                  <div *ngIf="formRegister.get('password').hasError('minlength')">
+                    la contraseña debe tener minimo 8 caracteres
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row pb-2">
+              <div class="col">
+                  <label class="mb-0">Fecha de nacimiento</label>
+                  <input type="date" formControlName="birthdate"
+                  class="form-control" [class.is-invalid]="formRegister.get('birthdate').errors && formRegister.get('birthdate').touched">
+                  <div *ngIf="formRegister.get('birthdate').errors && formRegister.get('birthdate').touched" class="invalid-feedback d-block">
+                    <div *ngIf="formRegister.get('birthdate').hasError('required')">
+                      fecha de nacimiento requerida 
+                    </div>
+                  </div>
+              </div>
+            </div>
+
+            <div class="form-row pb-2">
+              <div class="col">
+                <div class="form-check form-check-inline">
+                  <input type="radio" value="m" formControlName="sex" name="sex" class="form-check-input" id="sexMan">
+                  <label class="form-check-label" for="sexMan">Hombre</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input type="radio" value="f" formControlName="sex" name="sex" class="form-check-input" id="sexWoman">
+                  <label class="form-check-label" for="sexWoman">Mujer</label>
+                </div>
+                <div *ngIf="formRegister.get('sex').errors && formRegister.get('sex').touched" class="invalid-feedback d-block">
+                  <div *ngIf="formRegister.get('sex').hasError('required')">
+                    seleccione un sexo
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="col">
+                <button type="submit" (click)="onRegister()"  class="btn btn-block btn-outline-primary">Registrarse</button>
+              </div>
+            </div>
+            <hr>
+
+            <div class="form-row pb-2">
+              <div class="col">
+                <a (click)="onLoginFacebook()" class="btn btn-block btn-primary text-white">
+                  <span class="fa fa-facebook"></span>
+                  Ingresar con facebook
+                </a>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="col">
+                <a (click)="onLoginGoogle()" class="btn btn-block btn-danger text-white">
+                  <span class="fa fa-google"></span>
+                  Ingresar con google
+                </a>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="container-fluid fixed-bottom py-2 bg-dark">
+  <span class="text-muted">Powered by <a href="https://www.facebook.com/breiner.mola.9">Brekaz</a> · 2019</span>
+</footer>

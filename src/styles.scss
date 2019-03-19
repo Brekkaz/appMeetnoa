@@ -1,1 +1,15 @@
-/* You can add global styles to this file, and also import other style files */
+body{
+  font-family: 'Freight Sans', Arial, sans-serif;
+}
+
+.bgMeetnoa {
+  background: linear-gradient(to left, #333399, #ff00cc);
+}
+
+.fontMeetnoa{
+  font-family: chiller, Courier, monospace
+}
+
+@media (max-width: 414px) {
+  footer { position: relative !important; }
+}
