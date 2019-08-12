@@ -1,6 +1,9 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, OnInit, Renderer2, OnDestroy, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AngularFireStorage } from '@angular/fire/storage';
+import { finalize } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 import { UserService } from '../../../../services/user.service';
 
@@ -13,12 +16,15 @@ import { UserService } from '../../../../services/user.service';
 export class LoginComponent implements OnInit, OnDestroy {
   public formLogin: FormGroup;
   public formRegister: FormGroup;
-  public error={
-    state:false,
-    msg:''
-  };
+  public error={ state:false, msg:'' };
+
+  uploadPercent: Observable<number>;
+  urlImg: Observable<string>;
+  refPhoto;
+
 
   constructor(
+    private afStorage: AngularFireStorage,
     private formBuilder: FormBuilder, 
     private userService: UserService,
     @Inject(DOCUMENT) private document: Document,
@@ -45,26 +51,9 @@ export class LoginComponent implements OnInit, OnDestroy {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       birthdate: ['', [Validators.required]],
-      sex: ['', [Validators.required]]
+      sex: ['', [Validators.required]],
+      photo: ['', [Validators.required]]
     });
-  }
-  
-  onRegister() {
-    for(let i in this.formRegister.controls)
-      this.formRegister.controls[i].markAsTouched();
-    if (this.formRegister.invalid) return;
-
-    this.userService.registerEmailPasswordUser(this.formRegister.value.email, this.formRegister.value.password)
-    .then(res => {
-      this.userService.updateBasicUserData({
-        uid: (<any>res).user.uid,
-        firstname: this.formRegister.value.firstname,
-        lastname: this.formRegister.value.lastname,
-        email: this.formRegister.value.email,
-        birthdate: this.formRegister.value.birthdate,
-        sex: this.formRegister.value.sex
-      });
-    }).catch(err => this.showAuthError(err.code, err.message));
   }
   
   onLoginEmailPassword(): void {
@@ -72,7 +61,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.error = { state:true, msg:'Digite usuario y contraseña validos' };
       return;
     }
-
+    
     this.userService.loginEmailPasswordUser(this.formLogin.value.email, this.formLogin.value.password)
     .then(res => console.log('res', res))
     .catch(err => this.showAuthError(err.code, err.message));
@@ -90,12 +79,42 @@ export class LoginComponent implements OnInit, OnDestroy {
   onLoginGoogle():void {
     this.userService.loginGoogleUser()
     .then(res => {
-    console.log('res', res);
-      //this.updateUserData(credential.user)
+      console.log('res', res);
     })
     .catch(err => this.showAuthError(err.code, err.message));
   }
+  
 
+  onRegister() {
+    const filePath = `uploads/${this.getUid()}.jpg`;
+    const ref = this.afStorage.ref(filePath);
+    const task = this.afStorage.upload(filePath, this.refPhoto);
+    this.uploadPercent = task.percentageChanges();
+    task.snapshotChanges().pipe(finalize(()=> this.urlImg = ref.getDownloadURL())).subscribe();
+
+
+    console.log(this.refPhoto)
+    /*for(let i in this.formRegister.controls)
+      this.formRegister.controls[i].markAsTouched();
+    if (this.formRegister.invalid) return;
+
+    this.userService.registerEmailPasswordUser(this.formRegister.value.email, this.formRegister.value.password)
+    .then(res => {
+      this.userService.updateBasicUserData({
+        uid: (<any>res).user.uid,
+        firstname: this.formRegister.value.firstname,
+        lastname: this.formRegister.value.lastname,
+        email: this.formRegister.value.email,
+        birthdate: this.formRegister.value.birthdate,
+        sex: this.formRegister.value.sex
+      });
+    }).catch(err => this.showAuthError(err.code, err.message));*/
+  }
+  
+  loginOk(){
+
+  }
+  
   showAuthError(errorCode: string, errorMsg: string){
     this.error.state = true;
 
@@ -105,6 +124,29 @@ export class LoginComponent implements OnInit, OnDestroy {
     else if (errorCode == "auth/popup-closed-by-user") this.error.msg = "Procedimiento de logueo no completado";
     else if (errorCode == "auth/email-already-in-use") this.error.msg = "El email ya se encuentra registrado";
     else this.error.msg = errorMsg;
+  }
+
+  getUid(): string {
+    let seq1 = Math.floor(Math.random() * (99 - 10)) + 10;
+    let seq2 = Math.floor(Math.random() * (99 - 10)) + 10;
+    let date = new Date();
+    let year = date.getFullYear();
+    let mounth = date.getMonth() < 10 ? `0${date.getMonth()}` : date.getMonth();
+    let day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate(); 
+    let hours = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours(); 
+    let minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes(); 
+    let seconds = date.getSeconds() < 10 ? `0${date.getSeconds()}` : date.getSeconds();
+    let milliseconds = date.getMilliseconds() < 10 ? `00${date.getMilliseconds()}` : date.getMilliseconds() < 100 ? `0${date.getMilliseconds()}` : date.getMilliseconds();
+
+    //año[4]mes[2]dia[2]hora[2]minutos[2]segundos[2]milesimas[3]seq1[2]seq2[2]
+    return `${year}${mounth}${day}${hours}${minutes}${seconds}${milliseconds}${seq1}${seq2}`;
+  }
+
+  onUploadPhoto(e){
+    if (e.target.files[0]) {
+      let file = e.target.files[0];
+      this.refPhoto = file;
+    }
   }
 
 }

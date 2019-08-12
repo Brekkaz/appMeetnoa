@@ -2,7 +2,7 @@
   <div class="row contentLogin pb-5">
     <div class="col-md-6 text-center">
       <div class="col-md-12 text-white">
-        <h1 class="fontMeetnoa display-1">Meetnoa</h1>
+        <h1 class="fontMeetnoa display-3">Meetnoa</h1>
         <h4>conoce, disfruta, diviertete</h4>
       </div>
       <hr>
@@ -128,9 +128,31 @@
               </div>
             </div>
 
+            <div class="form-row pb-5">
+              <div class="col">
+                <label class="mb-0">Imagen</label>
+                <input type="file" formControlName="photo" (change)="onUploadPhoto($event)" accept=".png, .jpg"
+                class="form-control-file" [class.is-invalid]="formRegister.get('photo').errors && formRegister.get('photo').touched">
+                <div *ngIf="formRegister.get('photo').errors && formRegister.get('photo').touched" class="invalid-feedback d-block">
+                  <div *ngIf="formRegister.get('photo').hasError('required')">
+                    la imagen es requerida 
+                  </div>
+                </div>
+
+                <div class="progress">
+                  <div class="progress-bar" role="progressbar" [style.width]="(uploadPercent | async)+'%'" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0">{{ (uploadPercent | async) || 0 }}%</div>
+                </div>
+
+
+              </div>
+            </div>
+
             <div class="form-row">
               <div class="col">
-                <button type="submit" (click)="onRegister()"  class="btn btn-block btn-outline-primary">Registrarse</button>
+                <button type="submit" *ngIf="urlImg | async; else btnDisabled" (click)="onRegister()"  class="btn btn-block btn-outline-primary">Registrarse</button>
+                <ng-template #btnDisabled>
+                  <button type="submit"  (click)="onRegister()"   class="btn btn-block btn-outline-secondary">Registrarse</button>
+                </ng-template>
               </div>
             </div>
             <hr>
